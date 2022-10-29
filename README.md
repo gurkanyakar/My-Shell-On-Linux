@@ -12,7 +12,7 @@ solutions : sudo apt update
 result : gcc compiler is working now!
 
 ## 29/10/2022
-add process.c file 
+add process.c file,contains -getpid and -getppid
 
 ## 30/10/2022
-add mysh.c file and read file
+add mysh.c file and read input
