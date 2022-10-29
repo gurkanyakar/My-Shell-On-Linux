@@ -12,4 +12,7 @@ solutions : sudo apt update
 result : gcc compiler is working now!
 
 ## 29/10/2022
-add test.c file 
+add process.c file 
+
+## 30/10/2022
+add mysh.c file and read file
