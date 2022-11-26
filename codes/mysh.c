@@ -23,10 +23,21 @@ void bashFunction()
         wait(&pid);
     }
 }
-void catFunction(char[] mystring)
+void lsFunction()
 {
-    printf("catFunction");
+    int pid = fork();
+    if (pid == 0)
+    {
+        int ev = execvp("/bin/ls", NULL);
+        perror("");
+    }
+    else
+    {
+        wait(&pid);
+    }
+
 }
+
 
 int main(int argc, char *argv[])
 {
@@ -47,15 +58,16 @@ int main(int argc, char *argv[])
             //printf("%s\n", token);
             if(strcmp(token, "cat") == 0)
             {
-                catFunction(input);
-                break;
+                printf("%s:",token);
+            }else{
+                printf("%s ", token);
             }
             
             token = strtok(NULL, " ");
         }
         if (strcmp(input, "ls\n") == 0)
         {
-            printf("ls was hit\n");
+            lsFunction();
         }
         else if (strcmp(input, "wait\n") == 0)
         {
@@ -70,7 +82,11 @@ int main(int argc, char *argv[])
         {
             printf("bash was hit\n");
             bashFunction();
+        }else if (strcmp(input, "clear\n") == 0)
+        {
+            system("clear");
         }
+        
         else
         {
             printf("unknown command\n");
