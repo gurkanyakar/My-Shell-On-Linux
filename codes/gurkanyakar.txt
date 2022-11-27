@@ -1,0 +1,1 @@
+pid = 4529 ppid = 4528 sistem saati = Sun Nov 27 20:42:39 2022

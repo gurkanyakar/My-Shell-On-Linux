@@ -1,1 +1,2 @@
-abc
+pid = 4470 ppid = 4469 sistem saati = Sun Nov 27 20:40:58 2022
+pid = 4491 ppid = 4469 sistem saati = Sun Nov 27 20:41:20 2022
