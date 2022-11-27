@@ -7,15 +7,35 @@
 #include <errno.h>
 #include <time.h>
 
-
-
-
 int main(int argc, char *argv[])
 {
-    
-    char str[80];
 
-    strcpy(str, "fix");
-    writefFunction(str);
-    return 0;
+    char s[80];
+    read(3, s, 80);
+    printf("---%s", s);
+    int inputSize = 1;
+    char *token = strtok(s, " ");
+    int i = 0;
+    for(int x=0; x<250; x++)
+        {
+            if(s[x] == ' '){
+                inputSize++;
+            }
+        }
+
+    char *array[inputSize];
+    while (token != NULL)
+    {
+        array[i++] = token;
+        token = strtok(NULL, " ");   
+    }
+
+    int count = 0;
+    count = atoi(array[0]);
+    if(strcmp(array[1],"writef")==0){
+        printf("test");
+        for(int j=0;j<count;j++){
+            
+        }
+    }
 }

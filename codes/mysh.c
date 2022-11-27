@@ -6,6 +6,7 @@
 #include <sys/wait.h>
 #include <errno.h>
 #include <time.h>
+#include <ctype.h>
 int pipefd[2];
 void writefFunction(char *filename){
     int ev = 0;
@@ -24,6 +25,32 @@ void writefFunction(char *filename){
     }
 }
 
+void execFunction(char *command){
+    int ev = 0;
+    int pid = fork();
+    if (pid == 0)
+    { 
+        write(pipefd[1], command, strlen(command));
+        ev = execv("execx", NULL);
+        perror("");
+        close(pipefd[1]);
+    }
+    else
+    { 
+        //write(pipefd[1], filename, strlen(filename));
+        wait(&ev);
+    }
+}
+
+int isNumber(char s[])
+{
+    for (int i = 0; s[i]!= '\0'; i++)
+    {
+        if (isdigit(s[i]) == 0)
+              return 0;
+    }
+    return 1;
+}
 
 void bashFunction()
 {
@@ -64,7 +91,6 @@ int main(int argc, char *argv[])
     char **inputArray;
     char input[250];
     int inputSize=1;
-    char* myString = "";
     // printf("welcome myshell ! by Gurkan Yakar \n");
 
     while (1)
@@ -121,29 +147,82 @@ int main(int argc, char *argv[])
             bashFunction();
         }else if (strcmp(array[0], "writef") == 0 || strcmp(array[0], "writef\n") == 0) 
         {
-            printf("%d",inputSize);
             if(inputSize!=3){
-                printf("eksik parametre\n");
+                printf("eksik parametre girdiniz\n");
             }else{
                 if(strcmp(array[1], "-f") == 0){
                     // file is exists
-                    //array[2] = strtok(array[2], "\n");
                     char str[80];
 
                     strcpy(str, array[2]);
                     writefFunction(str);
-                    /*
-                    if (access(array[2], 0) == 0) {
-                        // file exists; use pipe
-                        printf("file is exists..!\n");
-                    } else {
-                        // file doesn't exist
-                        printf("file is not exists..!\n");
-                    }*/
                 }
             }
+        }else if (strcmp(array[0], "execx") == 0 || strcmp(array[0], "execx\n") == 0) 
+        {//myshell>> execx -t 3 wriref -f myfile
+                    //array[2] = strtok(array[2],"\n");
+            if(strcmp(array[1], "-t") == 0 && isNumber(array[2]) == 1 ){
+                //writef
+                
+                if(strcmp(array[3], "writef") == 0 && strcmp(array[4], "-f") == 0 && inputSize == 6){
+                    // file is exists
+                    char str[80];
 
-            //printf("writef was hit\n");
+                    strcpy(str, array[2]);strcat(str, " ");
+                    strcat(str, array[3]);strcat(str, " ");
+                    strcat(str, array[4]);strcat(str, " ");
+                    strcat(str, array[5]);
+                    printf("%s",str);
+                    execFunction(str);
+                }else if((strcmp(array[3], "cat\n") == 0 || strcmp(array[3], "cat") == 0 ) && inputSize >2){
+                    // file is exists
+                    char str[80];
+
+                    strcpy(str, array[2]);
+                    for (int q = 3; q < inputSize; q++)
+                    {
+                        strcat(str, " ");
+                        strcat(str, array[q]);
+                    }
+                    printf("%s",str);
+                    execFunction(str);
+                }else if(strcmp(array[3], "ls\n") == 0  && inputSize == 3){
+                    // file is exists
+                    char str[80];
+
+                    strcpy(str, array[2]);strcat(str, " ");
+                    strcat(str, array[3]);//ls
+                    printf("%s",str);
+                    execFunction(str);
+                }else if(strcmp(array[3], "bash\n") == 0  && inputSize == 3){
+                    // file is exists
+                    char str[80];
+
+                    strcpy(str, array[2]);strcat(str, " ");
+                    strcat(str, array[3]);//ls
+                    printf("%s",str);
+                    execFunction(str);
+                }else if(strcmp(array[3], "exit\n") == 0  && inputSize == 3){
+                    // file is exists
+                    char str[80];
+
+                    strcpy(str, array[2]);strcat(str, " ");
+                    strcat(str, array[3]);//ls
+                    printf("%s",str);
+                    execFunction(str);
+                }else if(strcmp(array[3], "clear\n") == 0  && inputSize == 3){
+                    // file is exists
+                    char str[80];
+
+                    strcpy(str, array[2]);strcat(str, " ");
+                    strcat(str, array[3]);//ls
+                    printf("%s",str);
+                    execFunction(str);
+                }
+            
+            }else{
+                printf("yanlis");
+            }
         }else if (strcmp(input, "clear\n") == 0)
         {
             system("clear");
