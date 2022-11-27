@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
                     strcat(str, array[3]);strcat(str, " ");
                     strcat(str, array[4]);strcat(str, " ");
                     strcat(str, array[5]);
-                    printf("%s",str);
+                    //printf("%s",str);
                     execFunction(str);
                 }else if((strcmp(array[3], "cat\n") == 0 || strcmp(array[3], "cat") == 0 ) && inputSize >2){
                     // file is exists
