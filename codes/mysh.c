@@ -4,11 +4,28 @@
 #include <signal.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <errno.h>
-#include <sys/mman.h>
+#include <time.h>
+int pipefd[2];
+void writefFunction(char *filename){
+    printf("Topla fonksiyonu cagirildi");
+    printf("%d",strlen(filename));
+    int ev = 0;
+    int pid = fork();
+    if (pid == 0)
+    { 
+        write(pipefd[1], "talha", strlen("talha"));
+        ev = execv("topla", NULL);
+        perror("");
+        close(pipefd[1]);
+    }
+    else
+    { 
+        //write(pipefd[1], filename, strlen(filename));
+        wait(&ev);
+    }
+}
+
 
 void bashFunction()
 {
@@ -41,9 +58,14 @@ void lsFunction()
 
 int main(int argc, char *argv[])
 {
+    if (pipe(pipefd) < 0)
+    {
+        perror("pipe");
+        exit(1);
+    }
     char **inputArray;
     char input[250];
-    int inputSize;
+    int inputSize=1;
     char* myString = "";
     // printf("welcome myshell ! by Gurkan Yakar \n");
 
@@ -51,27 +73,44 @@ int main(int argc, char *argv[])
     {
         printf("myshell>> ");
         fgets(input, 250, stdin); // read input
-        printf("input: %s", input);
+        for(int x=0; x<250; x++)
+        {
+            if(input[x] == ' '){
+                inputSize++;
+            }
+        }
+        //printf("inputSize: %d \n", inputSize);
+        //printf("input: %s", input);
         char *token = strtok(input, " ");
+        char *array[inputSize];
+        int i = 0;
         while (token != NULL)
         {
-            //printf("%s\n", token);
-            if(strcmp(token, "cat") == 0)
-            {
-                printf("%s:",token);
-            }else{
-                printf("%s ", token);
-            }
-            
+            array[i++] = token;
             token = strtok(NULL, " ");
         }
+        //for (i = 0; i < inputSize; ++i) 
+        //   printf("%s\n", array[i]);
+
+
         if (strcmp(input, "ls\n") == 0)
         {
             lsFunction();
-        }
-        else if (strcmp(input, "wait\n") == 0)
+        }else if (strcmp(array[0], "cat") == 0 || strcmp(array[0], "cat\n")==0)
         {
-            printf("wait was hit\n");
+            if(strcmp(array[0], "cat\n")==0){
+                printf("eksik parametre girdiniz..!\n");
+            }else{
+                printf("cat:");
+            }
+            for (i = 1; i < inputSize; ++i){
+                if(i == inputSize-1){
+                    printf("%s", array[i]);
+                }else{
+                printf("%s ", array[i]);
+                }
+            } 
+                
         }
         else if (strcmp(input, "exit\n") == 0)
         {
@@ -82,15 +121,36 @@ int main(int argc, char *argv[])
         {
             printf("bash was hit\n");
             bashFunction();
+        }else if (strcmp(array[0], "writef") == 0 || strcmp(array[0], "writef\n") == 0) 
+        {
+            if(inputSize!=3){
+                printf("eksik parametre girdiniz..!\n");
+            }else{
+                if(strcmp(array[1], "-f") == 0){
+                    // file is exists
+                    array[2] = strtok(array[2], "\n");
+                    writefFunction(array[2]);
+                    /*
+                    if (access(array[2], 0) == 0) {
+                        // file exists; use pipe
+                        printf("file is exists..!\n");
+                    } else {
+                        // file doesn't exist
+                        printf("file is not exists..!\n");
+                    }*/
+                }
+            }
+
+            //printf("writef was hit\n");
         }else if (strcmp(input, "clear\n") == 0)
         {
             system("clear");
-        }
-        
-        else
+        }else
         {
             printf("unknown command\n");
         }
+
+        inputSize = 1;
     }
     return 0;
 }
