@@ -45,6 +45,5 @@ int main(void)
         fprintf(myfile, "sistem saati = %s", asctime (timeinfo));
         fclose(myfile);
     }
-
         return 0;
 }

@@ -6,18 +6,15 @@
 #include <sys/wait.h>
 #include <errno.h>
 #include <time.h>
-int pipefd[2];
+#include <ctype.h>
+
+
 int main(int argc, char *argv[])
 {
-    if (pipe(pipefd) < 0)
-    {
-        perror("pipe");
-        exit(1);
-    }
 
     char s[80];
     read(3, s, 80);
-    printf("---%s", s);
+    printf("%s", s);
     int inputSize = 1;
     char *token = strtok(s, " ");
     int i = 0;
@@ -40,25 +37,27 @@ int main(int argc, char *argv[])
     count = atoi(array[0]);
     if (strcmp(array[1], "writef") == 0)
     {
-        // char str[80];
-
-        // strcpy(str, array[3]); // 0 count 1 writef 2 -f 3 file.txt
-        int ev = 0;
-        int pid = fork();
-        if (pid == 0)
+        char str[80];
+        strcpy(str, array[3]); // 0 count 1 writef 2 -f 3 file.txt
+        char *isim = str;
+        int pid;
+        int ev;
+        for (int i = 0; i < count; i++)
         {
-            for (int i = 0; i < count; i++)
-            {
-                write(pipefd[1], array[3], strlen(array[3]));
+            ev = 0;
+            pid = fork();
+            if (pid == 0)
+            {   
+                //printf("Process: %8d -- i = %d\n", getpid(), i);
+                write(4, isim, strlen(isim));
                 ev = execv("writef", NULL);
                 perror("");
-                close(pipefd[1]);
+                
+            }else{
+                wait(&ev);
             }
-        }
-        else
-        {
-            // write(pipefd[1], filename, strlen(filename));
-            wait(&ev);
+            
+            
         }
     }
 }

@@ -14,7 +14,7 @@ void writefFunction(char *filename){
     if (pid == 0)
     { 
         write(pipefd[1], filename, strlen(filename));
-        ev = execv("topla", NULL);
+        ev = execv("writef", NULL);
         perror("");
         close(pipefd[1]);
     }
@@ -34,12 +34,12 @@ void execFunction(char *command){
         ev = execv("execx", NULL);
         perror("");
         close(pipefd[1]);
+    }else{
+        //write(pipefd[1], command, strlen(command));
+        //wait(&ev);
+        sleep(1);
     }
-    else
-    { 
-        //write(pipefd[1], filename, strlen(filename));
-        wait(&ev);
-    }
+    
 }
 
 int isNumber(char s[])
