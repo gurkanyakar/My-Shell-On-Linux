@@ -8,7 +8,7 @@
 #include <time.h>
 #include <ctype.h>
 int pipefd[2];
-void writefFunction(char *filename){
+void writefFunc(char *filename){
     int ev = 0;
     int pid = fork();
     if (pid == 0)
@@ -24,7 +24,7 @@ void writefFunction(char *filename){
     }
 }
 
-void execFunction(char *command){
+void execFunc(char *command){
     int ev = 0;
     int pid = fork();
     if (pid == 0)
@@ -50,7 +50,7 @@ int isNumber(char s[])
     return 1;
 }
 
-void bashFunction()
+void bashFunc()
 {
     int pid = fork();
     if (pid == 0)
@@ -64,7 +64,7 @@ void bashFunction()
     }
 }
 
-void lsFunction()
+void lsFunc()
 {
     int pid = fork();
     if (pid == 0)
@@ -79,7 +79,6 @@ void lsFunction()
 
 }
 
-
 int main(int argc, char *argv[])
 {
     if (pipe(pipefd) < 0)
@@ -89,7 +88,7 @@ int main(int argc, char *argv[])
     }
 
     char input[250];
-    int inputSize=1;
+    int size=1;
     // printf("welcome myshell ! by Gurkan Yakar \n");
 
     while (1)
@@ -99,26 +98,26 @@ int main(int argc, char *argv[])
         for(int x=0; x<250; x++)  // input size control
         {
             if(input[x] == ' '){ // if input has space
-                inputSize++;     // increase input size
+                size++;     // increase input size
             }
         }
-        //printf("inputSize: %d \n", inputSize);
+        //printf("size: %d \n", size);
         //printf("input: %s", input);
         char *token = strtok(input, " "); // split input by space
-        char *array[inputSize]; // array for input
+        char *array[size]; // array for input
         int i = 0; // array index
         while (token != NULL) // split input by space
         {
             array[i++] = token; // add input to array
             token = strtok(NULL, " "); // split input by space
         }
-        //for (i = 0; i < inputSize; ++i) 
+        //for (i = 0; i < size; ++i) 
         //   printf("%s\n", array[i]);
 
 
         if (strcmp(input, "ls\n") == 0) // ls command no argument
         {
-            lsFunction();
+            lsFunc();
         }else if (strcmp(array[0], "cat") == 0 || strcmp(array[0], "cat\n")==0) // cat command
         {
             if(strcmp(array[0], "cat\n")==0){ // if cat command has no argument
@@ -126,8 +125,8 @@ int main(int argc, char *argv[])
             }else{
                 printf("cat:");
             }
-            for (i = 1; i < inputSize; ++i){
-                if(i == inputSize-1){
+            for (i = 1; i < size; ++i){
+                if(i == size-1){
                     printf("%s", array[i]);
                 }else{
                 printf("%s ", array[i]);
@@ -141,24 +140,23 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(input, "bash\n") == 0) // bash command no argument
         {
-            printf("bash was hit\n");
-            bashFunction();
+            bashFunc();
         }else if (strcmp(array[0], "writef") == 0 || strcmp(array[0], "writef\n") == 0) // writef command
         {
-            if(inputSize!=3){
+            if(size!=3){
                 printf("You entered missing parameter input!\n"); // if writef command has no argument
             }else{ // 3 arguemnt 0 writef  1 -f  2 filename
                 if(strcmp(array[1], "-f") == 0){ // check -f
                     // file is exists
                     char str[80];
                     strcpy(str, array[2]); // copy filename to str
-                    writefFunction(str); 
+                    writefFunc(str); 
                 }
             }
         }else if (strcmp(array[0], "execx") == 0 || strcmp(array[0], "execx\n") == 0) // execx command
         {                                                                             //myshell>> [0]->execx [1]->-t [2]->3  [3]->wriref [4]->-f [5]->myfile
             if(strcmp(array[1], "-t") == 0 && isNumber(array[2]) == 1 ){ // check -t and time is number
-                if(strcmp(array[3], "writef") == 0 && strcmp(array[4], "-f") == 0 && inputSize == 6){  // check writef -f filename
+                if(strcmp(array[3], "writef") == 0 && strcmp(array[4], "-f") == 0 && size == 6){  // check writef -f filename
                     char str[80];
 
                     strcpy(str, array[2]);strcat(str, " "); // copy time to str
@@ -166,41 +164,41 @@ int main(int argc, char *argv[])
                     strcat(str, array[4]);strcat(str, " "); // copy -f to str
                     strcat(str, array[5]); // copy filename to str
                     //printf("%s",str);
-                    execFunction(str); // in function str will write to pipe
-                }else if((strcmp(array[3], "cat\n") == 0 || strcmp(array[3], "cat") == 0 ) && inputSize >3){ // check cat
+                    execFunc(str); // in function str will write to pipe
+                }else if((strcmp(array[3], "cat\n") == 0 || strcmp(array[3], "cat") == 0 ) && size >3){ // check cat
                     char str[80];
                     strcpy(str, array[2]); // copy time to str
-                    for (int q = 3; q < inputSize; q++) 
+                    for (int q = 3; q < size; q++) 
                     {
                         strcat(str, " "); 
                         strcat(str, array[q]); // copy cat arguments to str
                     }
                     //printf("%s",str);
-                    execFunction(str);
-                }else if((strcmp(array[3], "ls\n") == 0 || strcmp(array[3], "ls") == 0 )&& inputSize == 4){ // ls command no argument
+                    execFunc(str);
+                }else if((strcmp(array[3], "ls\n") == 0 || strcmp(array[3], "ls") == 0 )&& size == 4){ // ls command no argument
                     char str[80];
                     strcpy(str, array[2]);strcat(str, " "); // copy time to str
                     strcat(str, array[3]);//ls
                     //printf("%s",str);
-                    execFunction(str);
-                }else if(strcmp(array[3], "bash\n") == 0  && inputSize == 4){ // bash command no argument
+                    execFunc(str);
+                }else if(strcmp(array[3], "bash\n") == 0  && size == 4){ // bash command no argument
                     char str[80];
                     strcpy(str, array[2]);strcat(str, " "); // copy time to str
                     strcat(str, array[3]);//bash
                     //printf("%s",str);
-                    execFunction(str);
-                }else if(strcmp(array[3], "exit\n") == 0  && inputSize == 4){ // exit command no argument
+                    execFunc(str);
+                }else if(strcmp(array[3], "exit\n") == 0  && size == 4){ // exit command no argument
                     char str[80];
                     strcpy(str, array[2]);strcat(str, " "); // copy time to str
                     strcat(str, array[3]);//exit
                     //printf("%s",str);
-                    execFunction(str);
-                }else if(strcmp(array[3], "clear\n") == 0  && inputSize == 4){ // clear command no argument
+                    execFunc(str);
+                }else if(strcmp(array[3], "clear\n") == 0  && size == 4){ // clear command no argument
                     char str[80];
                     strcpy(str, array[2]);strcat(str, " "); // copy time to str
                     strcat(str, array[3]);//clear
                     //printf("%s",str);
-                    execFunction(str);
+                    execFunc(str);
                 }else{
                     printf("You entered missing parameter input!\n");
                 }
@@ -223,7 +221,7 @@ int main(int argc, char *argv[])
             printf("Unknown command! Enter 'help' or 'commands' to see the commands available to you.\n");
         }
 
-        inputSize = 1;
+        size = 1;
     }
     return 0;
 }

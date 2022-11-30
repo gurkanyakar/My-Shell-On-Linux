@@ -22,18 +22,18 @@ int main(void)
     char *text = strtok(s, "\n"); // get filename from input
     if (access(text, 0) == 0) // file is exists
     {
-        FILE *myfile = fopen(text, "a");
+        FILE *myfile = fopen(text, "a"); // open file for append
         fprintf(myfile, "pid = %d ", pid);
         fprintf(myfile, "ppid = %d ", ppid);
-        fprintf(myfile, "sistem saati = %s", asctime (timeinfo));
+        fprintf(myfile, "system time = %s", asctime (timeinfo));
         fclose(myfile);
     }
     else // file is not exists
     {
-        FILE *myfile = fopen(text, "w");
+        FILE *myfile = fopen(text, "w"); // open file for write
         fprintf(myfile, "pid = %d ", pid);
         fprintf(myfile, "ppid = %d ", ppid);
-        fprintf(myfile, "sistem saati = %s", asctime (timeinfo));
+        fprintf(myfile, "system time = %s", asctime (timeinfo));
         fclose(myfile);
     }
         return 0;

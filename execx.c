@@ -11,29 +11,29 @@
 int main(int argc, char *argv[])
 {
 
-    char s[80];
-    read(3, s, 80);
+    char s[80]; // input for pipe read
+    read(3, s, 80); // read from pipe
     //printf("%s", s);
-    int inputSize = 1;
-    char *token = strtok(s, " ");
+    int inputSize = 1; // input size
+    char *token = strtok(s, " "); 
     int i = 0;
-    for (int x = 0; x < 250; x++)
+    for (int x = 0; x < 80; x++) // calculate inmut size
     {
-        if (s[x] == ' ')
+        if (s[x] == ' ') 
         {
-            inputSize++;
+            inputSize++; // count input size
         }
     }
 
-    char *array[inputSize];
+    char *array[inputSize]; // create array for input
     while (token != NULL)
     {
-        array[i++] = token;
-        token = strtok(NULL, " ");
+        array[i++] = token; // add input to array
+        token = strtok(NULL, " "); // split input
     }
 
     int count = 0;
-    count = atoi(array[0]);
+    count = atoi(array[0]); // array [0] is count atoi is convert string to int
     char str[80];
     
     int pid;
@@ -42,23 +42,22 @@ int main(int argc, char *argv[])
     if (strcmp(array[1], "writef") == 0)
     {
         strcpy(str, array[3]); // 0 count 1 writef 2 -f 3 file.txt
-    char *isim = str;
+    char *filename = str;
         for (int i = 0; i < count; i++)
         {
             ev = 0;
-            pid = fork();
+            pid = fork(); // fork
             
-            if (pid == 0)
+            if (pid == 0) // child process
             {
                 // printf("Process: %8d -- i = %d\n", getpid(), i);
-            
-                write(4, isim, strlen(isim));
+                write(4, filename, strlen(filename));
                 ev = execv("writef", NULL);
                 perror("");
             }
-            else
+            else // parent process
             {
-                wait(&ev);
+                wait(&ev); // wait child process
             }
         }
     }
@@ -68,13 +67,13 @@ int main(int argc, char *argv[])
         {
             ev = 0;
             pid = fork();
-            if (pid == 0)
+            if (pid == 0) // child process
             {
-                ev = execvp("/bin/ls", NULL);
+                ev = execvp("/bin/ls", NULL); // exec for ls
             }
             else
             {
-                wait(&ev);
+                wait(&ev); // wait child process
             }
         }
     }
