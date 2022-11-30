@@ -20,7 +20,6 @@ void writefFunction(char *filename){
     }
     else
     { 
-        //write(pipefd[1], filename, strlen(filename));
         wait(&ev);
     }
 }
@@ -35,9 +34,8 @@ void execFunction(char *command){
         perror("");
         close(pipefd[1]);
     }else{
-        //write(pipefd[1], command, strlen(command));
         //wait(&ev);
-        sleep(1);
+        //sleep(1);
     }
     
 }
@@ -65,6 +63,7 @@ void bashFunction()
         wait(&pid);
     }
 }
+
 void lsFunction()
 {
     int pid = fork();
@@ -88,42 +87,42 @@ int main(int argc, char *argv[])
         perror("pipe");
         exit(1);
     }
-    char **inputArray;
+
     char input[250];
     int inputSize=1;
     // printf("welcome myshell ! by Gurkan Yakar \n");
 
     while (1)
     {
-        printf("myshell>> ");
-        fgets(input, 250, stdin); // read input
-        for(int x=0; x<250; x++)
+        printf("myshell>> "); // command line start
+        fgets(input, 250, stdin); // input from user
+        for(int x=0; x<250; x++)  // input size control
         {
-            if(input[x] == ' '){
-                inputSize++;
+            if(input[x] == ' '){ // if input has space
+                inputSize++;     // increase input size
             }
         }
         //printf("inputSize: %d \n", inputSize);
         //printf("input: %s", input);
-        char *token = strtok(input, " ");
-        char *array[inputSize];
-        int i = 0;
-        while (token != NULL)
+        char *token = strtok(input, " "); // split input by space
+        char *array[inputSize]; // array for input
+        int i = 0; // array index
+        while (token != NULL) // split input by space
         {
-            array[i++] = token;
-            token = strtok(NULL, " ");
+            array[i++] = token; // add input to array
+            token = strtok(NULL, " "); // split input by space
         }
         //for (i = 0; i < inputSize; ++i) 
         //   printf("%s\n", array[i]);
 
 
-        if (strcmp(input, "ls\n") == 0)
+        if (strcmp(input, "ls\n") == 0) // ls command no argument
         {
             lsFunction();
-        }else if (strcmp(array[0], "cat") == 0 || strcmp(array[0], "cat\n")==0)
+        }else if (strcmp(array[0], "cat") == 0 || strcmp(array[0], "cat\n")==0) // cat command
         {
-            if(strcmp(array[0], "cat\n")==0){
-                printf("eksik parametre girdiniz..!\n");
+            if(strcmp(array[0], "cat\n")==0){ // if cat command has no argument
+                printf("You entered missing parameter input!\n");
             }else{
                 printf("cat:");
             }
@@ -136,99 +135,92 @@ int main(int argc, char *argv[])
             } 
                 
         }
-        else if (strcmp(input, "exit\n") == 0)
+        else if (strcmp(input, "exit\n") == 0) // exit command no argument
         {
-            printf("Cikis yapiliyor..!");
             exit(0);
         }
-        else if (strcmp(input, "bash\n") == 0)
+        else if (strcmp(input, "bash\n") == 0) // bash command no argument
         {
             printf("bash was hit\n");
             bashFunction();
-        }else if (strcmp(array[0], "writef") == 0 || strcmp(array[0], "writef\n") == 0) 
+        }else if (strcmp(array[0], "writef") == 0 || strcmp(array[0], "writef\n") == 0) // writef command
         {
             if(inputSize!=3){
-                printf("eksik parametre girdiniz\n");
-            }else{
-                if(strcmp(array[1], "-f") == 0){
+                printf("You entered missing parameter input!\n"); // if writef command has no argument
+            }else{ // 3 arguemnt 0 writef  1 -f  2 filename
+                if(strcmp(array[1], "-f") == 0){ // check -f
                     // file is exists
                     char str[80];
-
-                    strcpy(str, array[2]);
-                    writefFunction(str);
+                    strcpy(str, array[2]); // copy filename to str
+                    writefFunction(str); 
                 }
             }
-        }else if (strcmp(array[0], "execx") == 0 || strcmp(array[0], "execx\n") == 0) 
-        {//myshell>> execx -t 3 wriref -f myfile
-                    //array[2] = strtok(array[2],"\n");
-            if(strcmp(array[1], "-t") == 0 && isNumber(array[2]) == 1 ){
-                //writef
-                
-                if(strcmp(array[3], "writef") == 0 && strcmp(array[4], "-f") == 0 && inputSize == 6){
-                    // file is exists
+        }else if (strcmp(array[0], "execx") == 0 || strcmp(array[0], "execx\n") == 0) // execx command
+        {                                                                             //myshell>> [0]->execx [1]->-t [2]->3  [3]->wriref [4]->-f [5]->myfile
+            if(strcmp(array[1], "-t") == 0 && isNumber(array[2]) == 1 ){ // check -t and time is number
+                if(strcmp(array[3], "writef") == 0 && strcmp(array[4], "-f") == 0 && inputSize == 6){  // check writef -f filename
                     char str[80];
 
-                    strcpy(str, array[2]);strcat(str, " ");
-                    strcat(str, array[3]);strcat(str, " ");
-                    strcat(str, array[4]);strcat(str, " ");
-                    strcat(str, array[5]);
+                    strcpy(str, array[2]);strcat(str, " "); // copy time to str
+                    strcat(str, array[3]);strcat(str, " "); // copy writef to str
+                    strcat(str, array[4]);strcat(str, " "); // copy -f to str
+                    strcat(str, array[5]); // copy filename to str
+                    //printf("%s",str);
+                    execFunction(str); // in function str will write to pipe
+                }else if((strcmp(array[3], "cat\n") == 0 || strcmp(array[3], "cat") == 0 ) && inputSize >3){ // check cat
+                    char str[80];
+                    strcpy(str, array[2]); // copy time to str
+                    for (int q = 3; q < inputSize; q++) 
+                    {
+                        strcat(str, " "); 
+                        strcat(str, array[q]); // copy cat arguments to str
+                    }
                     //printf("%s",str);
                     execFunction(str);
-                }else if((strcmp(array[3], "cat\n") == 0 || strcmp(array[3], "cat") == 0 ) && inputSize >2){
-                    // file is exists
+                }else if((strcmp(array[3], "ls\n") == 0 || strcmp(array[3], "ls") == 0 )&& inputSize == 4){ // ls command no argument
                     char str[80];
-
-                    strcpy(str, array[2]);
-                    for (int q = 3; q < inputSize; q++)
-                    {
-                        strcat(str, " ");
-                        strcat(str, array[q]);
-                    }
-                    printf("%s",str);
-                    execFunction(str);
-                }else if(strcmp(array[3], "ls\n") == 0  && inputSize == 3){
-                    // file is exists
-                    char str[80];
-
-                    strcpy(str, array[2]);strcat(str, " ");
+                    strcpy(str, array[2]);strcat(str, " "); // copy time to str
                     strcat(str, array[3]);//ls
-                    printf("%s",str);
+                    //printf("%s",str);
                     execFunction(str);
-                }else if(strcmp(array[3], "bash\n") == 0  && inputSize == 3){
-                    // file is exists
+                }else if(strcmp(array[3], "bash\n") == 0  && inputSize == 4){ // bash command no argument
                     char str[80];
-
-                    strcpy(str, array[2]);strcat(str, " ");
-                    strcat(str, array[3]);//ls
-                    printf("%s",str);
+                    strcpy(str, array[2]);strcat(str, " "); // copy time to str
+                    strcat(str, array[3]);//bash
+                    //printf("%s",str);
                     execFunction(str);
-                }else if(strcmp(array[3], "exit\n") == 0  && inputSize == 3){
-                    // file is exists
+                }else if(strcmp(array[3], "exit\n") == 0  && inputSize == 4){ // exit command no argument
                     char str[80];
-
-                    strcpy(str, array[2]);strcat(str, " ");
-                    strcat(str, array[3]);//ls
-                    printf("%s",str);
+                    strcpy(str, array[2]);strcat(str, " "); // copy time to str
+                    strcat(str, array[3]);//exit
+                    //printf("%s",str);
                     execFunction(str);
-                }else if(strcmp(array[3], "clear\n") == 0  && inputSize == 3){
-                    // file is exists
+                }else if(strcmp(array[3], "clear\n") == 0  && inputSize == 4){ // clear command no argument
                     char str[80];
-
-                    strcpy(str, array[2]);strcat(str, " ");
-                    strcat(str, array[3]);//ls
-                    printf("%s",str);
+                    strcpy(str, array[2]);strcat(str, " "); // copy time to str
+                    strcat(str, array[3]);//clear
+                    //printf("%s",str);
                     execFunction(str);
+                }else{
+                    printf("You entered missing parameter input!\n");
                 }
             
             }else{
-                printf("yanlis");
+                printf("You entered missing parameter input!!\n");
             }
-        }else if (strcmp(input, "clear\n") == 0)
+        }else if (strcmp(input, "clear\n") == 0) // clear command no argument
         {
             system("clear");
+        }else if (strcmp(input, "help\n") == 0 || strcmp(input, "commands\n") == 0) // help command no argument
+        {
+            printf("ls - Displays the files in the directory\n");
+            printf("bash - Runs bash program\n");
+            printf("clear - Cleans everything in terminal\n");
+            printf("exit - Allows to terminate the running program\n");
+            printf("cat - Prints all text to the command line\n");
         }else
         {
-            printf("unknown command\n");
+            printf("Unknown command! Enter 'help' or 'commands' to see the commands available to you.\n");
         }
 
         inputSize = 1;

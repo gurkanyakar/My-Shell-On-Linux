@@ -10,35 +10,26 @@
 
 int main(void)
 {
-    //char sentence[100];
-    int pid = getpid();
-    int ppid = getppid();
-    time_t rawtime;
-    struct tm * timeinfo;
-
+    int pid = getpid(); // process id
+    int ppid = getppid();   // parent process id
+    time_t rawtime; 
+    struct tm * timeinfo; 
     time ( &rawtime );
     timeinfo = localtime ( &rawtime );
-    //printf ( "Current local time and date: %s", asctime (timeinfo) );
 
-    char s[30];
-    read(3, s, 30);
-    char *text = strtok(s, "\n");
-    if (access(text, 0) == 0)
+    char s[30]; // input for pipe read
+    read(3, s, 30); // read from pipe
+    char *text = strtok(s, "\n"); // get filename from input
+    if (access(text, 0) == 0) // file is exists
     {
-        // file exists; use pipe
-        printf("file is exists..!\n");
         FILE *myfile = fopen(text, "a");
-
-        
         fprintf(myfile, "pid = %d ", pid);
         fprintf(myfile, "ppid = %d ", ppid);
         fprintf(myfile, "sistem saati = %s", asctime (timeinfo));
         fclose(myfile);
     }
-    else
+    else // file is not exists
     {
-        // file doesn't exist
-        printf("file is not exists..!\n");
         FILE *myfile = fopen(text, "w");
         fprintf(myfile, "pid = %d ", pid);
         fprintf(myfile, "ppid = %d ", ppid);
